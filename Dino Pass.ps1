@@ -1,37 +1,33 @@
 ﻿#Config
-$dPassUrl = "http://www.dinopass.com/password/simple" 
-$txtfile = "$PSScriptRoot\pass.txt"
+$dPassUrl = "http://www.dinopass.com/password/simple" #Change this to http://www.dinopass.com/password/strong for strong passwords
 $start_time = Get-Date
-$displayResponceTime = 0 #Indicates if we show the API Responce time
+$debug = 0
 $rateLimiter = 0 #Rate limiter in seconds before we go grab another password
-$generate1Password = 1 #Generates 1 Password only when run
+$generate1Password = 0 #Generates 1 Password only when run
 
-function passwordGenerator 
-{
-    Invoke-WebRequest -Uri $dPassUrl -OutFile $txtfile
-        if ($displayResponceTime)
+function passwordGenerator{
+        $webRequestStrong = Invoke-WebRequest -Uri $dPassUrl -Headers @{"Cache-Control"="no-cache"}
+        $webRequestStrong.content
+        if ($debug)
         {
-            Write-Output "API Responce Time: $((Get-Date).Subtract($start_time).Milliseconds)Ms"
+            debug
         }
-    get-Content $txtfile
-    Start-Sleep -Seconds $rateLimiter
+            else
+        {
+            Start-Sleep -Seconds $rateLimiter
+        }
 }
-function cleanUp
-{
-Remove-Item $txtfile 
-}
-
-
-
-if ($generate1Password)
-{
-passwordGenerator
-cleanUp
+function debug{    
+    Write-Output "API Responce Time: $((Get-Date).Subtract($start_time).Milliseconds)Ms"
+    $webRequest.RawContent
+}   
+if ($generate1Password){
+    passwordGenerator
+    pause
 }
 else
 {
-While($true){
-passwordGenerator
-cleanUp
+while($true){
+    passwordGenerator
 }
 }
